@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Карта - UI тест v1.4</title>
+  <title>Карта доступности АЗС Proil</title>
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <style>
@@ -30,7 +30,6 @@
       height: 100%;
     }
 
-    /* Кнопка (i) - для десктопа */
     .legend-toggle-btn {
       position: absolute;
       bottom: 30px;
@@ -62,7 +61,6 @@
       background: rgba(192, 57, 43, 0.9);
     }
 
-    /* Десктопная панель управления */
     .desktop-controls {
       position: absolute;
       top: 20px;
@@ -71,19 +69,21 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      align-items: flex-end;
+      align-items: stretch;
+      min-width: 140px;
     }
     .desktop-controls .city-buttons {
       display: flex;
       gap: 8px;
     }
-    .desktop-controls .city-btn {
+    .desktop-controls .city-buttons .city-btn {
+      flex: 1;
       background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: 12px;
-      padding: 8px 16px;
+      padding: 8px 8px;
       font-size: 13px;
       font-weight: 500;
       color: #1f2a41;
@@ -91,22 +91,25 @@
       transition: all 0.2s ease;
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      text-align: center;
+      min-width: 0;
     }
-    .desktop-controls .city-btn:hover {
+    .desktop-controls .city-buttons .city-btn:hover {
       background: rgba(255, 255, 255, 1);
       transform: translateY(-1px);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     }
-    .desktop-controls .city-btn:active {
+    .desktop-controls .city-buttons .city-btn:active {
       transform: scale(0.95);
     }
 
-    /* Десктопный выпадающий список фильтра */
     .desktop-filter-dropdown {
       position: relative;
-      display: inline-block;
+      display: block;
+      width: 100%;
     }
     .desktop-filter-dropdown .filter-dropdown-btn {
+      width: 100%;
       background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
@@ -123,7 +126,6 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      min-width: 140px;
       justify-content: space-between;
     }
     .desktop-filter-dropdown .filter-dropdown-btn:hover {
@@ -143,6 +145,7 @@
       position: absolute;
       top: calc(100% + 4px);
       right: 0;
+      left: 0;
       background: rgba(255, 255, 255, 0.97);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -150,7 +153,6 @@
       padding: 6px 0;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
       border: 1px solid rgba(255, 255, 255, 0.3);
-      min-width: 180px;
       z-index: 20;
     }
     .desktop-filter-dropdown .filter-dropdown-menu.open {
@@ -163,6 +165,7 @@
       color: #1f2a41;
       transition: background 0.15s ease;
       white-space: nowrap;
+      text-align: center;
     }
     .desktop-filter-dropdown .filter-dropdown-menu .filter-option:hover {
       background: rgba(0, 0, 0, 0.05);
@@ -172,11 +175,10 @@
       font-weight: 600;
     }
 
-    /* Мобильная панель (стекло) */
     .mobile-glass-panel {
       display: none;
       position: absolute;
-      bottom: 100px;
+      bottom: 130px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.25);
@@ -241,7 +243,6 @@
       filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) brightness(100%) contrast(100%);
     }
 
-    /* Мобильное меню выбора города */
     .city-select-menu {
       display: none;
       position: absolute;
@@ -292,7 +293,6 @@
       background: rgba(0, 0, 0, 0.08);
     }
 
-    /* Мобильное меню фильтра */
     .filter-select-menu {
       display: none;
       position: absolute;
@@ -350,7 +350,7 @@
     .legend-popup {
       position: absolute;
       bottom: 100px;
-      right: 30px;
+      right: 100px;
       background: rgba(255, 255, 255, 0.97);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -442,7 +442,7 @@
     }
     .maplibregl-popup-content .popup-coords {
       font-size: 0.8rem;
-      color: #000000;
+      color: #8888ff;
       margin-top: 0.2rem;
       opacity: 0.7;
       cursor: pointer;
@@ -484,7 +484,6 @@
       color: #1f2a41 !important;
     }
 
-    /* Адаптив для мобильных */
     @media (max-width: 768px) {
       .legend-toggle-btn {
         display: none !important;
@@ -549,7 +548,6 @@
       }
     }
 
-    /* Адаптив с учетом URL-строки внизу */
     @supports (padding-bottom: env(safe-area-inset-bottom)) {
       .mobile-glass-panel {
         padding-bottom: calc(10px + env(safe-area-inset-bottom));
@@ -563,10 +561,12 @@
         bottom: calc(190px + env(safe-area-inset-bottom));
       }
       .legend-popup {
-        bottom: calc(190px + env(safe-area-inset-bottom));
+        bottom: calc(100px + env(safe-area-inset-bottom));
+        right: calc(100px + env(safe-area-inset-bottom));
       }
       .legend-toggle-btn {
         bottom: calc(30px + env(safe-area-inset-bottom));
+        right: calc(30px + env(safe-area-inset-bottom));
       }
     }
 
@@ -751,10 +751,8 @@
 <div id="map-container">
   <div id="map"></div>
 
-  <!-- Кнопка (i) - десктоп -->
   <button class="legend-toggle-btn" id="legendToggleBtn">i</button>
 
-  <!-- Десктопные элементы управления -->
   <div class="desktop-controls">
     <div class="city-buttons">
       <button class="city-btn" id="mskBtn">МСК</button>
@@ -774,7 +772,6 @@
     </div>
   </div>
 
-  <!-- Мобильная стеклянная панель -->
   <div class="mobile-glass-panel" id="mobileGlassPanel">
     <button class="glass-btn" id="filterBtn">☰</button>
     <button class="glass-btn" id="cityBtn">
@@ -786,23 +783,20 @@
     <button class="glass-btn" id="legendBtn">i</button>
   </div>
 
-  <!-- Мобильное меню выбора города -->
   <div class="city-select-menu" id="citySelectMenu">
     <div class="city-select-menu-title">Выберите город</div>
     <div class="city-option" data-city="msk" data-lng="37.6173" data-lat="55.7558">Москва</div>
     <div class="city-option" data-city="spb" data-lng="30.3166" data-lat="59.9343">Санкт-Петербург</div>
   </div>
 
-  <!-- Мобильное меню фильтра -->
   <div class="filter-select-menu" id="filterSelectMenu">
-    <div class="filter-select-menu-title">Фильтр по типу</div>
+    <div class="filter-select-menu-title">Выберите сеть АЗС</div>
     <div class="filter-option active-filter" data-filter="all">Все АЗС</div>
     <div class="filter-option" data-filter="type1">Газпромнефть</div>
     <div class="filter-option" data-filter="type2">Татнефть</div>
     <div class="filter-option" data-filter="other">Другие</div>
   </div>
 
-  <!-- Легенда -->
   <div class="legend-popup" id="legendPopup">
     <div class="legend-popup-title">Доступность АЗС</div>
     <div id="legendItems">
@@ -890,7 +884,6 @@
       'other': 'Другие'
     };
 
-    // ---- Функция закрытия всех мобильных меню ----
     function closeAllMobileMenus(except) {
       if (except !== 'city') {
         citySelectMenu.classList.remove('visible');
@@ -907,26 +900,23 @@
       }
     }
 
-    // ---- Переключение городов ----
     function flyToCity(lng, lat, zoom) {
       map.flyTo({
         center: [lng, lat],
-        zoom: zoom || 10,
+        zoom: zoom || 12,
         essential: true,
         duration: 1500
       });
     }
 
-    // ---- Десктоп кнопки ----
     mskBtn.addEventListener('click', function() {
-      flyToCity(37.6173, 55.7558, 12);
+      flyToCity(37.6173, 55.7558, 11);
     });
 
     spbBtn.addEventListener('click', function() {
-      flyToCity(30.3166, 59.9343, 12);
+      flyToCity(30.3166, 59.9343, 10);
     });
 
-    // ---- Десктоп фильтр ----
     desktopFilterBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       desktopFilterMenu.classList.toggle('open');
@@ -937,10 +927,8 @@
       option.addEventListener('click', function(e) {
         e.stopPropagation();
         const filter = this.dataset.filter;
-        
         desktopFilterOptions.forEach(opt => opt.classList.remove('active-filter'));
         this.classList.add('active-filter');
-        
         desktopFilterLabel.textContent = filterLabels[filter] || 'Все объекты';
         currentFilter = filter;
         applyFilter();
@@ -958,7 +946,6 @@
       }
     });
 
-    // ---- Мобильная кнопка "Город" ----
     cityBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       const isVisible = citySelectMenu.classList.contains('visible');
@@ -969,18 +956,17 @@
       }
     });
 
-    // ---- Выбор города из меню ----
     cityOptions.forEach(option => {
       option.addEventListener('click', function(e) {
         e.stopPropagation();
         const lng = parseFloat(this.dataset.lng);
         const lat = parseFloat(this.dataset.lat);
-        flyToCity(lng, lat, 12);
+        const zoom = this.dataset.city === 'msk' ? 11 : 10;
+        flyToCity(lng, lat, zoom);
         closeAllMobileMenus();
       });
     });
 
-    // ---- Мобильная кнопка "Фильтр" ----
     filterBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       const isVisible = filterSelectMenu.classList.contains('visible');
@@ -991,15 +977,12 @@
       }
     });
 
-    // ---- Выбор фильтра (мобильный) ----
     filterOptions.forEach(option => {
       option.addEventListener('click', function(e) {
         e.stopPropagation();
         const filter = this.dataset.filter;
-        
         filterOptions.forEach(opt => opt.classList.remove('active-filter'));
         this.classList.add('active-filter');
-        
         currentFilter = filter;
         desktopFilterLabel.textContent = filterLabels[filter] || 'Все объекты';
         desktopFilterOptions.forEach(opt => {
@@ -1010,7 +993,6 @@
       });
     });
 
-    // ---- Мобильная кнопка "i" (Легенда) ----
     legendBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       const isVisible = legendPopup.classList.contains('visible');
@@ -1022,7 +1004,6 @@
       }
     });
 
-    // ---- Легенда (десктоп) ----
     legendToggleBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       const isVisible = legendPopup.classList.contains('visible');
@@ -1037,23 +1018,18 @@
       }
     });
 
-    // ---- Закрытие всех меню при клике вне ----
     document.addEventListener('click', function(e) {
       const isClickOnCity = citySelectMenu.contains(e.target) || cityBtn.contains(e.target);
       const isClickOnFilter = filterSelectMenu.contains(e.target) || filterBtn.contains(e.target);
       const isClickOnLegend = legendPopup.contains(e.target) || legendToggleBtn.contains(e.target) || legendBtn.contains(e.target);
-      
       if (!isClickOnCity && !isClickOnFilter && !isClickOnLegend) {
         closeAllMobileMenus();
       }
     });
 
-    // ---- Применение фильтра по label ----
     function applyFilter() {
       if (!map.getSource('markers') || allFeatures.length === 0) return;
-
       let filteredFeatures = allFeatures;
-
       if (currentFilter === 'type1') {
         filteredFeatures = allFeatures.filter(f => {
           const label = f.properties.label.toLowerCase();
@@ -1070,23 +1046,19 @@
           return label !== 'газпромнефть' && label !== 'татнефть';
         });
       }
-
       if (hiddenColors.size > 0) {
         filteredFeatures = filteredFeatures.filter(f => {
           const color = f.properties.color;
           return !hiddenColors.has(color);
         });
       }
-
       const filteredGeoJSON = {
         type: 'FeatureCollection',
         features: filteredFeatures
       };
-
       map.getSource('markers').setData(filteredGeoJSON);
     }
 
-    // ---- Фильтрация по цветам (легенда) ----
     legendItems.forEach(item => {
       item.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -1102,30 +1074,22 @@
       });
     });
 
-    // ---- Определение местоположения при загрузке ----
     function locateUser() {
       if (locationAttempted) return;
       locationAttempted = true;
-
-      if (!navigator.geolocation) {
-        return;
-      }
-
+      if (!navigator.geolocation) return;
       navigator.geolocation.getCurrentPosition(
         function(position) {
           const { latitude, longitude } = position.coords;
-
           map.flyTo({
             center: [longitude, latitude],
             zoom: 12,
             essential: true,
             duration: 2000
           });
-
           if (map.getSource('user-location')) {
             map.removeSource('user-location');
           }
-
           map.addSource('user-location', {
             type: 'geojson',
             data: {
@@ -1137,11 +1101,9 @@
               properties: {}
             }
           });
-
           if (map.getLayer('user-location-layer')) {
             map.removeLayer('user-location-layer');
           }
-
           map.addLayer({
             id: 'user-location-layer',
             type: 'circle',
@@ -1160,11 +1122,9 @@
               'circle-blur': 0.1
             }
           });
-
           if (map.getLayer('user-location-pulse')) {
             map.removeLayer('user-location-pulse');
           }
-
           map.addLayer({
             id: 'user-location-pulse',
             type: 'circle',
@@ -1191,7 +1151,6 @@
       );
     }
 
-    // ---- Остальные функции ----
     function getColorHex(color) {
       if (!color) return '#3b82f6';
       const c = String(color).trim();
@@ -1219,12 +1178,10 @@
 
     function renderMarkers(data) {
       clearMarkers();
-
       if (!data || data.length === 0) {
         allFeatures = [];
         return;
       }
-
       const features = data.map((item, index) => {
         const color = getColorHex(item.color);
         return {
@@ -1244,19 +1201,15 @@
           }
         };
       });
-
       allFeatures = features;
-
       const geojson = {
         type: 'FeatureCollection',
         features: features
       };
-
       map.addSource('markers', {
         type: 'geojson',
         data: geojson
       });
-
       map.addLayer({
         id: 'marker-circle-layer',
         type: 'circle',
@@ -1266,9 +1219,9 @@
             'interpolate', ['linear'], ['zoom'],
             0, 3,
             4, 4,
-            8, 5,
-            12, 6,
-            19, 8
+            8, 6,
+            12, 10,
+            19, 10
           ],
           'circle-color': ['get', 'color'],
           'circle-stroke-width': 1.5,
@@ -1276,7 +1229,6 @@
           'circle-opacity': 0.92,
         }
       });
-
       applyFilter();
       bindPopup();
     }
@@ -1284,10 +1236,8 @@
     function parseCSV(csvText) {
       const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
       if (lines.length === 0) return [];
-
       const headers = lines[0].split(';').map(h => h.trim().toLowerCase());
       const result = [];
-
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(';').map(v => v.trim());
         const row = {};
@@ -1296,29 +1246,24 @@
         });
         result.push(row);
       }
-
       return result;
     }
 
     function loadMarkersFromCSV(csvText) {
       const dataArray = parseCSV(csvText);
-
       if (!dataArray || dataArray.length === 0) {
         renderMarkers([]);
         return;
       }
-
       const parsed = [];
       for (let row of dataArray) {
         const lon = parseFloat(row.longitude);
         const lat = parseFloat(row.latitude);
         if (isNaN(lon) || isNaN(lat)) continue;
-
         const label = row.label || 'Маркер';
         const desc = row.description || '';
         const datetime = row.datetime || '';
         const color = row['marker-color'] || '#3b82f6';
-
         parsed.push({
           lon, lat,
           label: String(label),
@@ -1327,7 +1272,6 @@
           color: getColorHex(color),
         });
       }
-
       renderMarkers(parsed);
     }
 
@@ -1347,7 +1291,6 @@
       const datetime = props.datetime || '';
       const lon = props.lon || 0;
       const lat = props.lat || 0;
-
       let html = '';
       if (description) html += `<div class="popup-desc">${description}</div>`;
       if (label) html += `<div class="popup-label">${label}</div>`;
@@ -1356,12 +1299,10 @@
         <span>${lat.toFixed(6)}, ${lon.toFixed(6)}</span>
       </div>`;
       if (!html) html = '<div class="popup-label">Маркер</div>';
-
       popup
         .setLngLat(feature.geometry.coordinates)
         .setHTML(html)
         .addTo(map);
-
       setTimeout(() => {
         const coordsEl = document.querySelector('.popup-coords');
         if (coordsEl) {
@@ -1370,7 +1311,6 @@
             const lon = this.dataset.lon;
             const lat = this.dataset.lat;
             const coordString = `${lat}, ${lon}`;
-            
             if (navigator.clipboard && navigator.clipboard.writeText) {
               navigator.clipboard.writeText(coordString).then(() => {
                 this.classList.add('copied');
@@ -1411,7 +1351,6 @@
     function bindPopup() {
       map.off('click', 'marker-circle-layer', onMarkerClick);
       map.on('click', 'marker-circle-layer', onMarkerClick);
-
       map.on('mouseenter', 'marker-circle-layer', () => {
         map.getCanvas().style.cursor = 'pointer';
       });
@@ -1432,22 +1371,18 @@
         console.warn('GitHub raw URL не указан');
         return;
       }
-
       try {
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
         const csvText = await response.text();
-
         if (!csvText || csvText.trim() === '') {
           console.warn('CSV файл пуст');
           return;
         }
-
         loadMarkersFromCSV(csvText);
         console.log('CSV файл загружен из GitHub');
-
       } catch (err) {
         console.error('Ошибка загрузки из GitHub:', err);
       }
@@ -1457,7 +1392,6 @@
       if (GITHUB_RAW_URL && GITHUB_RAW_URL.trim() !== '') {
         loadFromGitHub(GITHUB_RAW_URL);
       }
-
       setTimeout(function() {
         locateUser();
       }, 800);
