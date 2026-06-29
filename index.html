@@ -178,7 +178,7 @@
     .mobile-glass-panel {
       display: none;
       position: absolute;
-      bottom: 150px;
+      bottom: 100px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.25);
@@ -191,7 +191,7 @@
       z-index: 10;
       display: none;
       gap: 8px;
-      min-width: 280px;
+      min-width: 320px;
       max-width: 95%;
       width: auto;
     }
@@ -501,7 +501,7 @@
       .legend-popup {
         bottom: 190px;
         left: 50%;
-        transform: translate(-50%, -50%) scale(0.95);
+        transform: translate(-50%, 0) scale(0.95);
         right: auto;
         top: auto;
         max-width: 90%;
@@ -511,7 +511,7 @@
         border-radius: 16px;
       }
       .legend-popup.visible {
-        transform: translate(-50%, -50%) scale(1);
+        transform: translate(-50%, 0) scale(1);
       }
       .legend-popup-title {
         font-size: 0.9rem;
@@ -568,8 +568,8 @@
         display: flex !important;
       }
       .legend-popup {
-        bottom: 100px;
-        right: 30px;
+        bottom: 30px;
+        right: 100px;
         left: auto;
         top: auto;
         transform: translateY(12px) scale(0.95);
@@ -581,35 +581,13 @@
       }
     }
 
-    @supports (padding-bottom: env(safe-area-inset-bottom)) {
-      .mobile-glass-panel {
-        padding-bottom: calc(10px + env(safe-area-inset-bottom));
-        margin-bottom: env(safe-area-inset-bottom);
-        bottom: calc(100px + env(safe-area-inset-bottom));
-      }
-      .city-select-menu {
-        bottom: calc(190px + env(safe-area-inset-bottom));
-      }
-      .filter-select-menu {
-        bottom: calc(190px + env(safe-area-inset-bottom));
-      }
-      .legend-toggle-btn {
-        bottom: calc(30px + env(safe-area-inset-bottom));
-        right: calc(30px + env(safe-area-inset-bottom));
-      }
-      .legend-popup {
-        bottom: calc(100px + env(safe-area-inset-bottom));
-        right: calc(100px + env(safe-area-inset-bottom));
-      }
-    }
-
     @media (max-width: 480px) {
       .mobile-glass-panel {
         bottom: 90px;
         padding: 8px 12px;
         border-radius: 14px;
         gap: 5px;
-        min-width: 240px;
+        min-width: 280px;
         max-width: 96%;
       }
       .mobile-glass-panel .glass-btn {
@@ -643,6 +621,7 @@
         padding: 0.4rem 0.6rem;
       }
       .legend-popup {
+        bottom: 160px;
         width: 260px;
         padding: 0.9rem 1rem 1rem;
       }
@@ -652,7 +631,7 @@
       .mobile-glass-panel {
         bottom: 80px;
         padding: 6px 10px;
-        min-width: 180px;
+        min-width: 220px;
         gap: 4px;
       }
       .mobile-glass-panel .glass-btn {
@@ -685,6 +664,7 @@
         padding: 0.3rem 0.5rem;
       }
       .legend-popup {
+        bottom: 140px;
         width: 220px;
         padding: 0.7rem 0.9rem 0.9rem;
         font-size: 0.8rem;
@@ -695,7 +675,7 @@
       .mobile-glass-panel {
         bottom: 60px;
         padding: 6px 12px;
-        min-width: 240px;
+        min-width: 260px;
       }
       .mobile-glass-panel .glass-btn {
         font-size: 22px;
@@ -727,6 +707,7 @@
         padding: 0.3rem 0.6rem;
       }
       .legend-popup {
+        bottom: 120px;
         width: 240px;
         padding: 0.7rem 1rem 0.9rem;
         max-height: 70vh;
@@ -745,24 +726,29 @@
       }
     }
 
-    @supports (padding: max(0px)) {
-      .legend-toggle-btn {
-        padding-bottom: max(0px, env(safe-area-inset-bottom));
-      }
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
       .mobile-glass-panel {
-        padding-bottom: max(10px, env(safe-area-inset-bottom));
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        margin-bottom: env(safe-area-inset-bottom);
+        bottom: calc(100px + env(safe-area-inset-bottom));
       }
       .city-select-menu {
-        padding-bottom: max(12px, env(safe-area-inset-bottom));
+        bottom: calc(190px + env(safe-area-inset-bottom));
       }
       .filter-select-menu {
-        padding-bottom: max(12px, env(safe-area-inset-bottom));
+        bottom: calc(190px + env(safe-area-inset-bottom));
+      }
+      .legend-popup {
+        bottom: calc(190px + env(safe-area-inset-bottom));
+      }
+      .legend-toggle-btn {
+        bottom: calc(30px + env(safe-area-inset-bottom));
+        right: calc(30px + env(safe-area-inset-bottom));
       }
     }
   </style>
 </head>
 <body>
-
 <div id="map-container">
   <div id="map"></div>
 
