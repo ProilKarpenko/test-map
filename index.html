@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Карта доступности АЗС Proil</title>
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #e9edf4;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #map-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .legend-toggle-btn {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(31, 42, 65, 0.9);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      font-size: 22px;
+      font-weight: 600;
+      font-style: italic;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Georgia', serif;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .legend-toggle-btn:active {
+      transform: scale(0.92);
+    }
+    .legend-toggle-btn.active {
+      background: rgba(192, 57, 43, 0.9);
+    }
+
+    .legend-popup {
+      position: absolute;
+      bottom: 100px;
+      right: 30px;
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 1.2rem 1.6rem 1.4rem;
+      min-width: 200px;
+      max-width: 280px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      z-index: 10;
+      opacity: 0;
+      transform: translateY(12px) scale(0.95);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      font-size: 0.95rem;
+      color: #1f2a41;
+    }
+    .legend-popup.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .legend-popup-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.7rem;
+      border-bottom: 2px solid #eef2f6;
+      padding-bottom: 0.4rem;
+      letter-spacing: 0.3px;
+      color: #0b1b33;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.4rem 0;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.15s ease;
+      user-select: none;
+    }
+    .legend-item:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .legend-item.hidden {
+      opacity: 0.4;
+    }
+    .legend-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+    .legend-label {
+      font-weight: 400;
+      color: #2f405b;
+      font-size: 0.9rem;
+      transition: all 0.15s ease;
+    }
+
+    .maplibregl-popup-content {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 0.8rem 1rem 0.7rem;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      background: #ffffff;
+      max-width: 320px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    .maplibregl-popup-content .popup-desc {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #000000;
+      margin-bottom: 0.1rem;
+    }
+    .maplibregl-popup-content .popup-label {
+      font-weight: 400;
+      color: #000000;
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+    .maplibregl-popup-content .popup-datetime {
+      font-size: 0.8rem;
+      color: #000000;
+      margin-top: 0.2rem;
+      opacity: 0.7;
+    }
+    .maplibregl-popup-content .popup-coords {
+      font-size: 0.8rem;
+      color: #000000;
+      margin-top: 0.2rem;
+      opacity: 0.7;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .maplibregl-popup-content .popup-coords:hover {
+      opacity: 1;
+    }
+    .maplibregl-popup-content .popup-coords .copy-icon {
+      font-size: 0.8rem;
+      opacity: 0.5;
+    }
+    .maplibregl-popup-content .popup-coords.copied .copy-icon {
+      opacity: 1;
+      color: #2ecc71;
+    }
+    .maplibregl-popup-close-button {
+      font-size: 1.2rem;
+      color: #000000;
+      opacity: 0.5;
+    }
+    .maplibregl-popup-close-button:hover {
+      opacity: 0.8;
+    }
+    .maplibregl-ctrl-attrib {
+      font-size: 9px !important;
+      background: rgba(255, 255, 255, 0.7) !important;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      padding: 2px 8px !important;
+      border-radius: 12px !important;
+      margin: 0 0 8px 8px !important;
+    }
+    .maplibregl-ctrl-attrib a {
+      color: #1f2a41 !important;
+    }
+
+    @media (max-width: 480px) {
+      .legend-toggle-btn {
+        bottom: 80px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        border-width: 1.5px;
+      }
+      .legend-popup {
+        bottom: 135px;
+        right: 12px;
+        left: 12px;
+        min-width: auto;
+        padding: 0.9rem 1.2rem 1.1rem;
+        font-size: 0.85rem;
+        border-radius: 16px;
+        max-width: none;
+      }
+      .legend-popup-title {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+      }
+      .legend-item {
+        padding: 0.3rem 0;
+        gap: 0.5rem;
+      }
+      .legend-dot {
+        width: 16px;
+        height: 16px;
+      }
+      .legend-label {
+        font-size: 0.8rem;
+      }
+      .maplibregl-popup-content {
+        padding: 0.6rem 0.8rem 0.5rem;
+        max-width: 240px;
+        border-radius: 12px;
+      }
+      .maplibregl-popup-content .popup-desc {
+        font-size: 0.9rem;
+      }
+      .maplibregl-popup-content .popup-label {
+        font-size: 0.8rem;
+      }
+      .maplibregl-popup-content .popup-datetime {
+        font-size: 0.7rem;
+      }
+      .maplibregl-popup-content .popup-coords {
+        font-size: 0.7rem;
+      }
+      .maplibregl-popup-close-button {
+        font-size: 1rem;
+        padding: 2px 4px;
+      }
+    }
+
+    @media (min-width: 481px) and (max-width: 768px) {
+      .legend-toggle-btn {
+        bottom: 85px;
+        right: 24px;
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+      }
+      .legend-popup {
+        bottom: 140px;
+        right: 20px;
+        min-width: 180px;
+        padding: 1rem 1.4rem 1.2rem;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .legend-toggle-btn {
+        bottom: 28px;
+        right: 28px;
+        width: 46px;
+        height: 46px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .legend-toggle-btn {
+        bottom: 70px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+      .legend-popup {
+        bottom: 120px;
+        right: 8px;
+        left: 8px;
+        padding: 0.7rem 0.9rem 0.9rem;
+        font-size: 0.8rem;
+        border-radius: 14px;
+      }
+      .legend-popup-title {
+        font-size: 0.8rem;
+      }
+      .legend-dot {
+        width: 14px;
+        height: 14px;
+      }
+      .legend-label {
+        font-size: 0.75rem;
+      }
+      .maplibregl-popup-content {
+        padding: 0.5rem 0.6rem 0.4rem;
+        max-width: 200px;
+        border-radius: 10px;
+      }
+      .maplibregl-popup-content .popup-desc {
+        font-size: 0.8rem;
+      }
+      .maplibregl-popup-content .popup-label {
+        font-size: 0.75rem;
+      }
+      .maplibregl-popup-content .popup-datetime {
+        font-size: 0.65rem;
+      }
+      .maplibregl-popup-content .popup-coords {
+        font-size: 0.65rem;
+      }
+    }
+
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+      .legend-toggle-btn {
+        border-width: 1px;
+      }
+    }
+
+    @media (max-width: 800px) and (orientation: landscape) {
+      .legend-toggle-btn {
+        bottom: 70px;
+        right: 16px;
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+      }
+      .legend-popup {
+        bottom: 120px;
+        right: 12px;
+        padding: 0.7rem 1rem 0.9rem;
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+      .maplibregl-popup-content {
+        max-width: 220px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .maplibregl-ctrl-zoom {
+        transform: scale(0.8);
+        transform-origin: bottom left;
+      }
+      .maplibregl-ctrl-attrib {
+        font-size: 7px !important;
+        padding: 1px 6px !important;
+      }
+    }
+
+    @supports (padding: max(0px)) {
+      .legend-toggle-btn {
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="map-container">
+  <div id="map"></div>
+  <button class="legend-toggle-btn" id="legendToggleBtn">i</button>
+  <div class="legend-popup" id="legendPopup">
+    <div class="legend-popup-title">Доступность АЗС</div>
+    <div id="legendItems">
+      <div class="legend-item" data-color="#e74c3c">
+        <span class="legend-dot" style="background: #e74c3c;"></span>
+        <span class="legend-label">Отказ в заправке</span>
+      </div>
+      <div class="legend-item" data-color="#f1c40f">
+        <span class="legend-dot" style="background: #f1c40f;"></span>
+        <span class="legend-label">Ограничение по литрам</span>
+      </div>
+      <div class="legend-item" data-color="#3498db">
+        <span class="legend-dot" style="background: #3498db;"></span>
+        <span class="legend-label">Нет топлива</span>
+      </div>
+      <div class="legend-item" data-color="#00ff00">
+        <span class="legend-dot" style="background: #00ff00;"></span>
+        <span class="legend-label">Доступна к заправке</span>
+      </div>
+      <div class="legend-item" data-color="#169a7a">
+        <span class="legend-dot" style="background: #169a7a;"></span>
+        <span class="legend-label">Возможно появилось топливо</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/ProilKarpenko/Proil_AZS/refs/heads/main/data.csv';
+
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {
+          'osm': {
+            type: 'raster',
+            tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+            tileSize: 256,
+            attribution: '&copy; OpenStreetMap contributors'
+          }
+        },
+        layers: [{
+          id: 'osm-layer',
+          type: 'raster',
+          source: 'osm',
+          minzoom: 0,
+          maxzoom: 19
+        }]
+      },
+      center: [37.6173, 55.7558],
+      zoom: 12,
+      attributionControl: true,
+      minZoom: 2,
+      maxZoom: 19,
+    });
+
+    let allFeatures = [];
+    let hiddenColors = new Set();
+    let locationAttempted = false;
+
+    const legendToggleBtn = document.getElementById('legendToggleBtn');
+    const legendPopup = document.getElementById('legendPopup');
+    const legendItems = document.querySelectorAll('.legend-item');
+
+    legendToggleBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const isVisible = legendPopup.classList.toggle('visible');
+      legendToggleBtn.classList.toggle('active', isVisible);
+    });
+
+    document.addEventListener('click', function(e) {
+      if (legendPopup.classList.contains('visible')) {
+        if (!legendPopup.contains(e.target) && e.target !== legendToggleBtn) {
+          legendPopup.classList.remove('visible');
+          legendToggleBtn.classList.remove('active');
+        }
+      }
+    });
+
+    legendItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const color = this.dataset.color;
+        if (hiddenColors.has(color)) {
+          hiddenColors.delete(color);
+          this.classList.remove('hidden');
+        } else {
+          hiddenColors.add(color);
+          this.classList.add('hidden');
+        }
+        applyVisibilityFilter();
+      });
+    });
+
+    function applyVisibilityFilter() {
+      if (!map.getSource('markers') || allFeatures.length === 0) return;
+      
+      const filteredFeatures = allFeatures.filter(f => {
+        const color = f.properties.color;
+        return !hiddenColors.has(color);
+      });
+
+      const filteredGeoJSON = {
+        type: 'FeatureCollection',
+        features: filteredFeatures
+      };
+
+      map.getSource('markers').setData(filteredGeoJSON);
+    }
+
+    function locateUser() {
+      if (locationAttempted) return;
+      locationAttempted = true;
+
+      if (!navigator.geolocation) {
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const { latitude, longitude } = position.coords;
+
+          map.flyTo({
+            center: [longitude, latitude],
+            zoom: 12,
+            essential: true,
+            duration: 2000
+          });
+
+          if (map.getSource('user-location')) {
+            map.removeSource('user-location');
+          }
+
+          map.addSource('user-location', {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [longitude, latitude]
+              },
+              properties: {}
+            }
+          });
+
+          if (map.getLayer('user-location-layer')) {
+            map.removeLayer('user-location-layer');
+          }
+
+          map.addLayer({
+            id: 'user-location-layer',
+            type: 'circle',
+            source: 'user-location',
+            paint: {
+              'circle-radius': [
+                'interpolate', ['linear'], ['zoom'],
+                0, 6,
+                10, 10,
+                15, 14
+              ],
+              'circle-color': '#3b82f6',
+              'circle-stroke-width': 3,
+              'circle-stroke-color': '#ffffff',
+              'circle-opacity': 0.9,
+              'circle-blur': 0.1
+            }
+          });
+
+          if (map.getLayer('user-location-pulse')) {
+            map.removeLayer('user-location-pulse');
+          }
+
+          map.addLayer({
+            id: 'user-location-pulse',
+            type: 'circle',
+            source: 'user-location',
+            paint: {
+              'circle-radius': [
+                'interpolate', ['linear'], ['zoom'],
+                0, 12,
+                10, 20,
+                15, 28
+              ],
+              'circle-color': '#3b82f6',
+              'circle-opacity': 0.2,
+              'circle-blur': 0.4
+            }
+          });
+        },
+        function(error) {},
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 60000
+        }
+      );
+    }
+
+    function getColorHex(color) {
+      if (!color) return '#3b82f6';
+      const c = String(color).trim();
+      if (/^#[0-9a-f]{6}$/i.test(c) || /^#[0-9a-f]{3}$/i.test(c)) return c;
+      return '#3b82f6';
+    }
+
+    function clearMarkers() {
+      const layers = map.getStyle().layers;
+      if (layers) {
+        const toRemove = [];
+        layers.forEach(layer => {
+          if (layer.id.startsWith('marker-circle-') || layer.id.startsWith('marker-symbol-')) {
+            toRemove.push(layer.id);
+          }
+        });
+        toRemove.forEach(id => {
+          if (map.getLayer(id)) map.removeLayer(id);
+        });
+      }
+      if (map.getSource('markers')) {
+        map.removeSource('markers');
+      }
+    }
+
+    function renderMarkers(data) {
+      clearMarkers();
+
+      if (!data || data.length === 0) {
+        allFeatures = [];
+        return;
+      }
+
+      const features = data.map((item, index) => {
+        const color = getColorHex(item.color);
+        return {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [item.lon, item.lat]
+          },
+          properties: {
+            id: index,
+            label: item.label || 'Маркер',
+            description: item.desc || '',
+            datetime: item.datetime || '',
+            color: color,
+            lon: item.lon,
+            lat: item.lat,
+          }
+        };
+      });
+
+      allFeatures = features;
+
+      const geojson = {
+        type: 'FeatureCollection',
+        features: features
+      };
+
+      map.addSource('markers', {
+        type: 'geojson',
+        data: geojson
+      });
+
+      map.addLayer({
+        id: 'marker-circle-layer',
+        type: 'circle',
+        source: 'markers',
+        paint: {
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            0, 3,
+            4, 4,
+            8, 6,
+            12, 8,
+            19, 10
+          ],
+          'circle-color': ['get', 'color'],
+          'circle-stroke-width': 1.5,
+          'circle-stroke-color': '#ffffff',
+          'circle-opacity': 0.92,
+        }
+      });
+
+      applyVisibilityFilter();
+      bindPopup();
+    }
+
+    function parseCSV(csvText) {
+      const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
+      if (lines.length === 0) return [];
+
+      const headers = lines[0].split(';').map(h => h.trim().toLowerCase());
+      const result = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(';').map(v => v.trim());
+        const row = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index] || '';
+        });
+        result.push(row);
+      }
+
+      return result;
+    }
+
+    function loadMarkersFromCSV(csvText) {
+      const dataArray = parseCSV(csvText);
+
+      if (!dataArray || dataArray.length === 0) {
+        renderMarkers([]);
+        return;
+      }
+
+      const parsed = [];
+      for (let row of dataArray) {
+        const lon = parseFloat(row.longitude);
+        const lat = parseFloat(row.latitude);
+        if (isNaN(lon) || isNaN(lat)) continue;
+
+        const label = row.label || 'Маркер';
+        const desc = row.description || '';
+        const datetime = row.datetime || '';
+        const color = row['marker-color'] || '#3b82f6';
+
+        parsed.push({
+          lon, lat,
+          label: String(label),
+          desc: String(desc),
+          datetime: String(datetime),
+          color: getColorHex(color),
+        });
+      }
+
+      renderMarkers(parsed);
+    }
+
+    const popup = new maplibregl.Popup({
+      closeButton: true,
+      closeOnClick: false,
+      offset: [0, -8],
+      className: 'custom-popup'
+    });
+
+    function onMarkerClick(e) {
+      const feature = e.features[0];
+      if (!feature) return;
+      const props = feature.properties;
+      const description = props.description || '';
+      const label = props.label || '';
+      const datetime = props.datetime || '';
+      const lon = props.lon || 0;
+      const lat = props.lat || 0;
+
+      let html = '';
+      if (description) html += `<div class="popup-desc">${description}</div>`;
+      if (label) html += `<div class="popup-label">${label}</div>`;
+      if (datetime) html += `<div class="popup-datetime">Последнее обновление: ${datetime}</div>`;
+      html += `<div class="popup-coords" data-lon="${lon}" data-lat="${lat}">
+        <span>${lat.toFixed(6)}, ${lon.toFixed(6)}</span>
+      </div>`;
+      if (!html) html = '<div class="popup-label">Маркер</div>';
+
+      popup
+        .setLngLat(feature.geometry.coordinates)
+        .setHTML(html)
+        .addTo(map);
+
+      setTimeout(() => {
+        const coordsEl = document.querySelector('.popup-coords');
+        if (coordsEl) {
+          coordsEl.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const lon = this.dataset.lon;
+            const lat = this.dataset.lat;
+            const coordString = `${lat}, ${lon}`;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(coordString).then(() => {
+                this.classList.add('copied');
+                setTimeout(() => {
+                  this.classList.remove('copied');
+                }, 2000);
+              }).catch(() => {
+                fallbackCopy(coordString, this);
+              });
+            } else {
+              fallbackCopy(coordString, this);
+            }
+          });
+        }
+      }, 100);
+    }
+
+    function fallbackCopy(text, element) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        element.classList.add('copied');
+        setTimeout(() => {
+          element.classList.remove('copied');
+        }, 2000);
+      } catch (err) {
+        console.error('Ошибка копирования:', err);
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function bindPopup() {
+      map.off('click', 'marker-circle-layer', onMarkerClick);
+      map.on('click', 'marker-circle-layer', onMarkerClick);
+
+      map.on('mouseenter', 'marker-circle-layer', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', 'marker-circle-layer', () => {
+        map.getCanvas().style.cursor = '';
+      });
+    }
+
+    map.on('click', function(e) {
+      const features = map.queryRenderedFeatures(e.point, { layers: ['marker-circle-layer'] });
+      if (!features.length) {
+        popup.remove();
+      }
+    });
+
+    async function loadFromGitHub(url) {
+      if (!url || url.trim() === '') {
+        console.warn('GitHub raw URL не указан');
+        return;
+      }
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const csvText = await response.text();
+
+        if (!csvText || csvText.trim() === '') {
+          console.warn('CSV файл пуст');
+          return;
+        }
+
+        loadMarkersFromCSV(csvText);
+        console.log('CSV файл загружен из GitHub');
+
+      } catch (err) {
+        console.error('Ошибка загрузки из GitHub:', err);
+      }
+    }
+
+    map.on('load', function() {
+      if (GITHUB_RAW_URL && GITHUB_RAW_URL.trim() !== '') {
+        loadFromGitHub(GITHUB_RAW_URL);
+      }
+
+      setTimeout(function() {
+        locateUser();
+      }, 800);
+    });
+
+    if (map.loaded()) {
+      if (GITHUB_RAW_URL && GITHUB_RAW_URL.trim() !== '') {
+        loadFromGitHub(GITHUB_RAW_URL);
+      }
+      setTimeout(function() {
+        locateUser();
+      }, 800);
+    } else {
+      map.on('load', function() {
+        if (GITHUB_RAW_URL && GITHUB_RAW_URL.trim() !== '') {
+          loadFromGitHub(GITHUB_RAW_URL);
+        }
+        setTimeout(function() {
+          locateUser();
+        }, 800);
+      });
+    }
+
+  })();
+</script>
+</body>
+</html>
