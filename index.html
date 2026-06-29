@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Карта - тест UI (Город)</title>
+  <title>Карта - UI тест (панель)</title>
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <style>
@@ -69,7 +69,7 @@
       bottom: 100px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.25);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.3);
@@ -79,8 +79,9 @@
       z-index: 10;
       display: none;
       gap: 8px;
-      min-width: 200px;
-      max-width: 90%;
+      min-width: 280px;
+      max-width: 95%;
+      width: auto;
     }
     .mobile-glass-panel .glass-btn {
       background: rgba(255, 255, 255, 0.15);
@@ -101,6 +102,7 @@
       align-items: center;
       justify-content: center;
       min-height: 48px;
+      min-width: 48px;
     }
     .mobile-glass-panel .glass-btn:active {
       transform: scale(0.92);
@@ -190,6 +192,79 @@
     }
     .city-select-menu .city-option .city-dot.spb {
       background: #3498db;
+    }
+
+    /* Мобильное меню фильтра */
+    .filter-select-menu {
+      display: none;
+      position: absolute;
+      bottom: 170px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      padding: 12px 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      z-index: 15;
+      min-width: 200px;
+      max-width: 90%;
+      opacity: 0;
+      transform: translateX(-50%) translateY(10px) scale(0.95);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+    }
+    .filter-select-menu.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .filter-select-menu-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #0b1b33;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      border-bottom: 1px solid #eef2f6;
+      padding-bottom: 0.4rem;
+    }
+    .filter-select-menu .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0.8rem;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background 0.15s ease;
+      font-size: 0.95rem;
+      color: #1f2a41;
+    }
+    .filter-select-menu .filter-option:active {
+      background: rgba(0, 0, 0, 0.08);
+    }
+    .filter-select-menu .filter-option .filter-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .filter-select-menu .filter-option .filter-dot.all {
+      background: #666;
+    }
+    .filter-select-menu .filter-option .filter-dot.type1 {
+      background: #e74c3c;
+    }
+    .filter-select-menu .filter-option .filter-dot.type2 {
+      background: #3498db;
+    }
+    .filter-select-menu .filter-option .filter-dot.other {
+      background: #2ecc71;
+    }
+    .filter-select-menu .filter-option.active-filter {
+      background: rgba(31, 42, 65, 0.1);
+      font-weight: 600;
     }
 
     /* Кнопки МСК и СПБ (десктоп) */
@@ -376,6 +451,9 @@
       .city-select-menu {
         display: block !important;
       }
+      .filter-select-menu {
+        display: block !important;
+      }
       .legend-popup {
         bottom: 170px;
         right: 12px;
@@ -424,20 +502,38 @@
       }
     }
 
+    /* Адаптив с учетом URL-строки внизу (safe-area-inset) */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      .mobile-glass-panel {
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        margin-bottom: env(safe-area-inset-bottom);
+      }
+      .city-select-menu {
+        bottom: calc(170px + env(safe-area-inset-bottom));
+      }
+      .filter-select-menu {
+        bottom: calc(170px + env(safe-area-inset-bottom));
+      }
+      .legend-popup {
+        bottom: calc(100px + env(safe-area-inset-bottom));
+      }
+    }
+
     @media (max-width: 480px) {
       .mobile-glass-panel {
         bottom: 90px;
         padding: 8px 12px;
         border-radius: 14px;
         gap: 5px;
-        min-width: 160px;
-        max-width: 92%;
+        min-width: 240px;
+        max-width: 96%;
       }
       .mobile-glass-panel .glass-btn {
         font-size: 22px;
         padding: 6px 10px;
         border-radius: 8px;
         min-height: 40px;
+        min-width: 40px;
       }
       .mobile-glass-panel .glass-btn .icon-img,
       .mobile-glass-panel .glass-btn .icon-img-location {
@@ -446,10 +542,19 @@
       }
       .city-select-menu {
         bottom: 150px;
-        min-width: 150px;
+        min-width: 160px;
+        padding: 10px 14px;
+      }
+      .filter-select-menu {
+        bottom: 150px;
+        min-width: 180px;
         padding: 10px 14px;
       }
       .city-select-menu .city-option {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+      }
+      .filter-select-menu .filter-option {
         font-size: 0.85rem;
         padding: 0.4rem 0.6rem;
       }
@@ -462,13 +567,14 @@
       .mobile-glass-panel {
         bottom: 80px;
         padding: 6px 10px;
-        min-width: 140px;
+        min-width: 180px;
         gap: 4px;
       }
       .mobile-glass-panel .glass-btn {
         font-size: 18px;
         padding: 5px 8px;
         min-height: 34px;
+        min-width: 34px;
       }
       .mobile-glass-panel .glass-btn .icon-img,
       .mobile-glass-panel .glass-btn .icon-img-location {
@@ -477,10 +583,19 @@
       }
       .city-select-menu {
         bottom: 130px;
-        min-width: 130px;
+        min-width: 140px;
+        padding: 8px 10px;
+      }
+      .filter-select-menu {
+        bottom: 130px;
+        min-width: 160px;
         padding: 8px 10px;
       }
       .city-select-menu .city-option {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.5rem;
+      }
+      .filter-select-menu .filter-option {
         font-size: 0.8rem;
         padding: 0.3rem 0.5rem;
       }
@@ -495,12 +610,13 @@
       .mobile-glass-panel {
         bottom: 60px;
         padding: 6px 12px;
-        min-width: 180px;
+        min-width: 240px;
       }
       .mobile-glass-panel .glass-btn {
         font-size: 22px;
         padding: 5px 10px;
         min-height: 36px;
+        min-width: 36px;
       }
       .mobile-glass-panel .glass-btn .icon-img,
       .mobile-glass-panel .glass-btn .icon-img-location {
@@ -512,7 +628,16 @@
         min-width: 160px;
         padding: 8px 12px;
       }
+      .filter-select-menu {
+        bottom: 110px;
+        min-width: 180px;
+        padding: 8px 12px;
+      }
       .city-select-menu .city-option {
+        font-size: 0.85rem;
+        padding: 0.3rem 0.6rem;
+      }
+      .filter-select-menu .filter-option {
         font-size: 0.85rem;
         padding: 0.3rem 0.6rem;
       }
@@ -530,6 +655,9 @@
         display: none !important;
       }
       .city-select-menu {
+        display: none !important;
+      }
+      .filter-select-menu {
         display: none !important;
       }
       .legend-toggle-btn {
@@ -559,6 +687,9 @@
         padding-bottom: max(10px, env(safe-area-inset-bottom));
       }
       .city-select-menu {
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+      }
+      .filter-select-menu {
         padding-bottom: max(12px, env(safe-area-inset-bottom));
       }
     }
@@ -594,6 +725,27 @@
     <div class="city-option" data-city="spb" data-lng="30.3166" data-lat="59.9343">
       <span class="city-dot spb"></span>
       Санкт-Петербург
+    </div>
+  </div>
+
+  <!-- Мобильное меню фильтра -->
+  <div class="filter-select-menu" id="filterSelectMenu">
+    <div class="filter-select-menu-title">Фильтр по типу</div>
+    <div class="filter-option active-filter" data-filter="all">
+      <span class="filter-dot all"></span>
+      Все объекты
+    </div>
+    <div class="filter-option" data-filter="type1">
+      <span class="filter-dot type1"></span>
+      Столицы
+    </div>
+    <div class="filter-option" data-filter="type2">
+      <span class="filter-dot type2"></span>
+      Научные центры
+    </div>
+    <div class="filter-option" data-filter="other">
+      <span class="filter-dot other"></span>
+      Остальные объекты
     </div>
   </div>
 
@@ -665,6 +817,7 @@
     let allFeatures = [];
     let hiddenColors = new Set();
     let locationAttempted = false;
+    let currentFilter = 'all';
 
     const legendToggleBtn = document.getElementById('legendToggleBtn');
     const legendPopup = document.getElementById('legendPopup');
@@ -676,6 +829,8 @@
     const spbBtn = document.getElementById('spbBtn');
     const citySelectMenu = document.getElementById('citySelectMenu');
     const cityOptions = document.querySelectorAll('.city-option');
+    const filterSelectMenu = document.getElementById('filterSelectMenu');
+    const filterOptions = document.querySelectorAll('.filter-option');
 
     // ---- Переключение городов ----
     function flyToCity(lng, lat, zoom) {
@@ -701,6 +856,8 @@
     // ---- Мобильная кнопка "Город" - открытие меню ----
     cityBtn.addEventListener('click', function(e) {
       e.stopPropagation();
+      filterSelectMenu.classList.remove('visible');
+      filterBtn.classList.remove('active');
       const isVisible = citySelectMenu.classList.toggle('visible');
       cityBtn.classList.toggle('active', isVisible);
     });
@@ -717,6 +874,74 @@
       });
     });
 
+    // ---- Мобильная кнопка "Фильтр" - открытие меню фильтра ----
+    filterBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      citySelectMenu.classList.remove('visible');
+      cityBtn.classList.remove('active');
+      const isVisible = filterSelectMenu.classList.toggle('visible');
+      filterBtn.classList.toggle('active', isVisible);
+    });
+
+    // ---- Выбор фильтра ----
+    filterOptions.forEach(option => {
+      option.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const filter = this.dataset.filter;
+        
+        filterOptions.forEach(opt => opt.classList.remove('active-filter'));
+        this.classList.add('active-filter');
+        
+        currentFilter = filter;
+        applyFilter();
+        filterSelectMenu.classList.remove('visible');
+        filterBtn.classList.remove('active');
+      });
+    });
+
+    // ---- Применение фильтра по label ----
+    function applyFilter() {
+      if (!map.getSource('markers') || allFeatures.length === 0) return;
+
+      let filteredFeatures = allFeatures;
+
+      if (currentFilter === 'type1') {
+        // Столицы (точное совпадение с label)
+        filteredFeatures = allFeatures.filter(f => {
+          const label = f.properties.label.toLowerCase();
+          return label === 'Газпромнефть';
+        });
+      } else if (currentFilter === 'type2') {
+        // Научные центры (точное совпадение с label)
+        filteredFeatures = allFeatures.filter(f => {
+          const label = f.properties.label.toLowerCase();
+          return label === 'Татнефть';
+        });
+      } else if (currentFilter === 'other') {
+        // Все остальные объекты (не попавшие в type1 и type2)
+        filteredFeatures = allFeatures.filter(f => {
+          const label = f.properties.label.toLowerCase();
+          return label !== 'Газпромнефть' && label !== 'Татнефть';
+        });
+      }
+      // currentFilter === 'all' - показываем все
+
+      // Дополнительно применяем фильтр по цветам из легенды
+      if (hiddenColors.size > 0) {
+        filteredFeatures = filteredFeatures.filter(f => {
+          const color = f.properties.color;
+          return !hiddenColors.has(color);
+        });
+      }
+
+      const filteredGeoJSON = {
+        type: 'FeatureCollection',
+        features: filteredFeatures
+      };
+
+      map.getSource('markers').setData(filteredGeoJSON);
+    }
+
     // ---- Закрытие меню при клике вне ----
     document.addEventListener('click', function(e) {
       if (citySelectMenu.classList.contains('visible')) {
@@ -725,6 +950,14 @@
         if (!isClickOnMenu && !isClickOnBtn) {
           citySelectMenu.classList.remove('visible');
           cityBtn.classList.remove('active');
+        }
+      }
+      if (filterSelectMenu.classList.contains('visible')) {
+        const isClickOnMenu = filterSelectMenu.contains(e.target);
+        const isClickOnBtn = e.target === filterBtn || filterBtn.contains(e.target);
+        if (!isClickOnMenu && !isClickOnBtn) {
+          filterSelectMenu.classList.remove('visible');
+          filterBtn.classList.remove('active');
         }
       }
     });
@@ -756,7 +989,7 @@
       }
     });
 
-    // ---- Фильтрация по цветам ----
+    // ---- Фильтрация по цветам (легенда) ----
     legendItems.forEach(item => {
       item.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -768,29 +1001,8 @@
           hiddenColors.add(color);
           this.classList.add('hidden');
         }
-        applyVisibilityFilter();
+        applyFilter();
       });
-    });
-
-    function applyVisibilityFilter() {
-      if (!map.getSource('markers') || allFeatures.length === 0) return;
-      
-      const filteredFeatures = allFeatures.filter(f => {
-        const color = f.properties.color;
-        return !hiddenColors.has(color);
-      });
-
-      const filteredGeoJSON = {
-        type: 'FeatureCollection',
-        features: filteredFeatures
-      };
-
-      map.getSource('markers').setData(filteredGeoJSON);
-    }
-
-    // ---- Мобильная кнопка "Фильтр" ----
-    filterBtn.addEventListener('click', function() {
-      alert('Фильтр по типу объекта (в разработке)');
     });
 
     // ---- Определение местоположения при загрузке ----
@@ -957,9 +1169,9 @@
             'interpolate', ['linear'], ['zoom'],
             0, 3,
             4, 4,
-            8, 6,
-            12, 10,
-            19, 10
+            8, 5,
+            12, 6,
+            19, 8
           ],
           'circle-color': ['get', 'color'],
           'circle-stroke-width': 1.5,
@@ -968,7 +1180,7 @@
         }
       });
 
-      applyVisibilityFilter();
+      applyFilter();
       bindPopup();
     }
 
@@ -1045,6 +1257,7 @@
       if (datetime) html += `<div class="popup-datetime">Информация предоставлена: ${datetime}</div>`;
       html += `<div class="popup-coords" data-lon="${lon}" data-lat="${lat}">
         <span>${lat.toFixed(6)}, ${lon.toFixed(6)}</span>
+        <span class="copy-icon">📋</span>
       </div>`;
       if (!html) html = '<div class="popup-label">Маркер</div>';
 
