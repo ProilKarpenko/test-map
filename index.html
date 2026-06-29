@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Карта - UI тест (панель) v1.1</title>
+  <title>Карта - UI тест (панель) v1.2</title>
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <style>
@@ -909,19 +909,19 @@
         // Столицы (точное совпадение с label)
         filteredFeatures = allFeatures.filter(f => {
           const label = f.properties.label.toLowerCase();
-          return label === 'Газпромнефть';
+          return label === 'газпромнефть';
         });
       } else if (currentFilter === 'type2') {
         // Научные центры (точное совпадение с label)
         filteredFeatures = allFeatures.filter(f => {
           const label = f.properties.label.toLowerCase();
-          return label === 'Татнефть';
+          return label === 'татнефть';
         });
       } else if (currentFilter === 'other') {
         // Все остальные объекты (не попавшие в type1 и type2)
         filteredFeatures = allFeatures.filter(f => {
           const label = f.properties.label.toLowerCase();
-          return label !== 'Газпромнефть' && label !== 'Татнефть';
+          return label !== 'газпромнефть' && label !== 'татнефть';
         });
       }
       // currentFilter === 'all' - показываем все
