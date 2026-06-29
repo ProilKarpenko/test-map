@@ -178,7 +178,7 @@
     .mobile-glass-panel {
       display: none;
       position: absolute;
-      bottom: 130px;
+      bottom: 100px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.25);
@@ -349,8 +349,6 @@
 
     .legend-popup {
       position: absolute;
-      bottom: 100px;
-      right: 100px;
       background: rgba(255, 255, 255, 0.97);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -442,7 +440,7 @@
     }
     .maplibregl-popup-content .popup-coords {
       font-size: 0.8rem;
-      color: #8888ff;
+      color: #000000;
       margin-top: 0.2rem;
       opacity: 0.7;
       cursor: pointer;
@@ -501,14 +499,19 @@
         display: block !important;
       }
       .legend-popup {
-        bottom: 190px;
-        right: 12px;
-        left: 12px;
-        min-width: auto;
-        max-width: none;
-        padding: 0.9rem 1.2rem 1.1rem;
+        bottom: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.95);
+        right: auto;
+        top: auto;
+        max-width: 90%;
+        width: 280px;
+        padding: 1rem 1.2rem 1.2rem;
         font-size: 0.85rem;
         border-radius: 16px;
+      }
+      .legend-popup.visible {
+        transform: translate(-50%, -50%) scale(1);
       }
       .legend-popup-title {
         font-size: 0.9rem;
@@ -548,6 +551,36 @@
       }
     }
 
+    @media (min-width: 769px) {
+      .mobile-glass-panel {
+        display: none !important;
+      }
+      .city-select-menu {
+        display: none !important;
+      }
+      .filter-select-menu {
+        display: none !important;
+      }
+      .legend-toggle-btn {
+        display: flex !important;
+      }
+      .desktop-controls {
+        display: flex !important;
+      }
+      .legend-popup {
+        bottom: 100px;
+        right: 100px;
+        left: auto;
+        top: auto;
+        transform: translateY(12px) scale(0.95);
+        max-width: 280px;
+        width: auto;
+      }
+      .legend-popup.visible {
+        transform: translateY(0) scale(1);
+      }
+    }
+
     @supports (padding-bottom: env(safe-area-inset-bottom)) {
       .mobile-glass-panel {
         padding-bottom: calc(10px + env(safe-area-inset-bottom));
@@ -560,13 +593,13 @@
       .filter-select-menu {
         bottom: calc(190px + env(safe-area-inset-bottom));
       }
-      .legend-popup {
-        bottom: calc(100px + env(safe-area-inset-bottom));
-        right: calc(100px + env(safe-area-inset-bottom));
-      }
       .legend-toggle-btn {
         bottom: calc(30px + env(safe-area-inset-bottom));
         right: calc(30px + env(safe-area-inset-bottom));
+      }
+      .legend-popup {
+        bottom: calc(100px + env(safe-area-inset-bottom));
+        right: calc(100px + env(safe-area-inset-bottom));
       }
     }
 
@@ -610,7 +643,8 @@
         padding: 0.4rem 0.6rem;
       }
       .legend-popup {
-        bottom: 160px;
+        width: 260px;
+        padding: 0.9rem 1rem 1rem;
       }
     }
 
@@ -651,7 +685,7 @@
         padding: 0.3rem 0.5rem;
       }
       .legend-popup {
-        bottom: 140px;
+        width: 220px;
         padding: 0.7rem 0.9rem 0.9rem;
         font-size: 0.8rem;
       }
@@ -693,29 +727,10 @@
         padding: 0.3rem 0.6rem;
       }
       .legend-popup {
-        bottom: 120px;
-        right: 12px;
+        width: 240px;
         padding: 0.7rem 1rem 0.9rem;
-        max-height: 50vh;
+        max-height: 70vh;
         overflow-y: auto;
-      }
-    }
-
-    @media (min-width: 769px) {
-      .mobile-glass-panel {
-        display: none !important;
-      }
-      .city-select-menu {
-        display: none !important;
-      }
-      .filter-select-menu {
-        display: none !important;
-      }
-      .legend-toggle-btn {
-        display: flex !important;
-      }
-      .desktop-controls {
-        display: flex !important;
       }
     }
 
@@ -910,11 +925,11 @@
     }
 
     mskBtn.addEventListener('click', function() {
-      flyToCity(37.6173, 55.7558, 11);
+      flyToCity(37.6173, 55.7558, 9);
     });
 
     spbBtn.addEventListener('click', function() {
-      flyToCity(30.3166, 59.9343, 10);
+      flyToCity(30.3166, 59.9343, 9);
     });
 
     desktopFilterBtn.addEventListener('click', function(e) {
