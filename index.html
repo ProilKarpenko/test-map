@@ -45,7 +45,9 @@
 
             const encodedAddress = encodeURIComponent(address);
             const encodedKey = encodeURIComponent(apiKey);
-            const url = `https://2gis.com{encodedAddress}&fields=items.point&key=${encodedKey}`;
+            const url = "https://2gis.com" + encodedAddress + "&fields=items.point&key=" + encodedKey;
+
+
 
             try {
                 const response = await fetch(url);
