@@ -31,51 +31,59 @@
     <div id="result"></div>
 
     <script>
-        async function geocodeAddress() {
-            const apiKey = document.getElementById('apiKey').value.trim();
-            const address = document.getElementById('address').value.trim();
-            const resultDiv = document.getElementById('result');
+        function geocodeAddress() {
+    const apiKey = document.getElementById('apiKey').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const resultDiv = document.getElementById('result');
 
-            if (!apiKey) {
-                resultDiv.innerText = 'Пожалуйста, введите API-ключ.';
-                return;
+    if (!apiKey) {
+        resultDiv.innerText = 'Пожалуйста, введите API-ключ.';
+        return;
+    }
+
+    resultDiv.innerText = 'Поиск...';
+
+    const encodedAddress = encodeURIComponent(address);
+    const encodedKey = encodeURIComponent(apiKey);
+    
+    // Имя функции для обратного вызова
+    const callbackName = 'handle2GisResponse'; 
+
+    // Формируем URL с параметром callback
+    const url = "https://catalog.api.2gis.com/3.0/items/geocode" 
+              + "?q=" + encodedAddress 
+              + "&fields=items.point" 
+              + "&key=" + encodedKey 
+              + "&callback=" + callbackName;
+
+    // Функция, которую автоматически вызовет 2ГИС при успешном ответе
+    window[callbackName] = function(data) {
+        if (data.result && data.result.items && data.result.items.length > 0) {
+            const firstItem = data.result.items[0];
+            if (firstItem.point) {
+                const lon = firstItem.point.lon;
+                const lat = firstItem.point.lat;
+                resultDiv.innerText = `Найдено:\nШирота (Lat): ${lat}\nДолгота (Lon): ${lon}`;
+            } else {
+                resultDiv.innerText = 'Объект найден, но у него нет точных координат.';
             }
-
-            resultDiv.innerText = 'Поиск...';
-
-            const encodedAddress = encodeURIComponent(address);
-            const encodedKey = encodeURIComponent(apiKey);
-            const url = "https://2gis.com" + encodedAddress + "&fields=items.point&key=" + encodedKey;
-
-
-
-            try {
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`Ошибка HTTP: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.result && data.result.items && data.result.items.length > 0) {
-                    const firstItem = data.result.items[0];
-                    
-                    if (firstItem.point) {
-                        const lon = firstItem.point.lon;
-                        const lat = firstItem.point.lat;
-
-                        resultDiv.innerText = `Найдено:\nШирота (Lat): ${lat}\nДолгота (Lon): ${lon}`;
-                    } else {
-                        resultDiv.innerText = 'Объект найден, но у него нет точных координат.';
-                    }
-                } else {
-                    resultDiv.innerText = 'Адрес не найден. Проверьте правильность написания.';
-                }
-            } catch (error) {
-                resultDiv.innerText = `Ошибка при запросе: ${error.message}`;
-            }
+        } else {
+            resultDiv.innerText = 'Адрес не найден или неверный ключ.';
         }
+        // Очищаем созданный скрипт
+        document.getElementById('jsonp-script').remove();
+    };
+
+    // Создаем динамический тег <script> (заменяет fetch)
+    const script = document.createElement('script');
+    script.id = 'jsonp-script';
+    script.src = url;
+    script.onerror = function() {
+        resultDiv.innerText = 'Ошибка сети или недействительный API-ключ.';
+    };
+
+    document.body.appendChild(script);
+}
     </script>
 </body>
 </html>
